@@ -5,7 +5,7 @@ const PORT = 3000;
 app.use(express.json());
 
 let students = [];
-let nextId = 1;
+let nextId = Date.now();
 
 const validateCreate = (body) => {
   const { name, age, email, course } = body;
@@ -22,7 +22,7 @@ const validateUpdate = (body) => {
   return null;
 };
 
-const findStudentOr404 = (req, res) => {
+const isStudentAvailable = (req, res) => {
   const id = Number(req.params.id);
   if (Number.isNaN(id)) {
     res.status(400).json({ error: "id must be a number" });
@@ -57,14 +57,14 @@ app.get("/students", (req, res) => {
 
 //Get a student by ID
 app.get("/students/:id", (req, res) => {
-  const student = findStudentOr404(req, res);
+  const student = isStudentAvailable(req, res);
   if (!student) return; // response already sent
   res.json(student);
 });
 
 //Update student information
 app.patch("/students/:id", (req, res) => {
-  const student = findStudentOr404(req, res);
+  const student = isStudentAvailable(req, res);
   if (!student) return;
 
   const error = validateUpdate(req.body);
@@ -83,7 +83,7 @@ app.patch("/students/:id", (req, res) => {
 
 //Full replace of student information
 app.put("/students/:id", (req, res) => {
-  const student = findStudentOr404(req, res);
+  const student = isStudentAvailable(req, res);
   if (!student) return;
 
   const error = validateCreate(req.body);
